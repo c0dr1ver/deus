@@ -43,10 +43,8 @@ Designed for quick diagnostics and disk usage analysis without multiple filesyst
 ## Example
 
 ```bash
-$ ./deus.sh
-Enter the absolute path to the folder: /home/user/Downloads
+$ ./deus_v1.sh /home/user/Downloads/
 Enter the file extension (e.g. mp3, pdf): pdf
-
 Total files: 1106
 Total size : 1.27 GB
 
