@@ -1,22 +1,58 @@
 #!/bin/bash
 
-read -rp "Enter the absolute path to the folder: " BASE_DIR
-read -rp "Enter the file extension (e.g. mp3, pdf): " EXT
+show_help() {
+    cat << 'EOF'
+Usage:
+  ./deus.sh /absolute/path/to/folder
+
+Description:
+  Scans the specified folder recursively, counts files by extension,
+  calculates total size, and shows aggregated usage by top-level folders.
+
+Arguments:
+  /absolute/path/to/folder   Absolute path to the target folder
+
+Options:
+  -h, --help                 Show this help message
+
+Example:
+  ./deus.sh /home/user/Downloads
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+    show_help
+    exit 1
+fi
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
+
+BASE_DIR="$1"
 
 if [[ "$BASE_DIR" != /* ]]; then
-    echo "Error: you must specify an absolute path, e.g. /home/user/Downloads"
+    echo "Error: you must specify an absolute path."
+    exit 1
+fi
+
+if [[ ! -e "$BASE_DIR" ]]; then
+    echo "Error: path does not exist: $BASE_DIR"
     exit 1
 fi
 
 if [[ ! -d "$BASE_DIR" ]]; then
-    echo "Error: directory does not exist: $BASE_DIR"
+    echo "Error: path is not a directory: $BASE_DIR"
     exit 1
 fi
+
+read -rp "Enter the file extension (e.g. mp3, pdf): " EXT
 
 EXT="${EXT#.}"
 
 if [[ -z "$EXT" ]]; then
-    echo "Error: file extension is not specified"
+    echo "Error: file extension is not specified."
     exit 1
 fi
 
