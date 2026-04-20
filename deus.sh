@@ -4,7 +4,7 @@ read -rp "Enter the absolute path to the folder: " BASE_DIR
 read -rp "Enter the file extension (e.g. mp3, pdf): " EXT
 
 if [[ "$BASE_DIR" != /* ]]; then
-    echo "Error: you must specify an absolute path, e.g. /home/bitrix/www/upload"
+    echo "Error: you must specify an absolute path, e.g. /home/user/Downloads"
     exit 1
 fi
 
