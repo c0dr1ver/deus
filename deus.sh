@@ -23,6 +23,39 @@ Examples:
 EOF
 }
 
+format_time() {
+    local total=$1
+    local h=$((total / 3600))
+    local m=$(((total % 3600) / 60))
+    local s=$((total % 60))
+
+    if (( h > 0 )); then
+        printf "%dh %02dm %02ds" "$h" "$m" "$s"
+    elif (( m > 0 )); then
+        printf "%dm %02ds" "$m" "$s"
+    else
+        printf "%ds" "$s"
+    fi
+}
+
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local frames='|/-\'
+    local i=0
+
+    tput civis 2>/dev/null
+
+    while kill -0 "$pid" 2>/dev/null; do
+        i=$(( (i + 1) % 4 ))
+        printf "\rScanning... %c" "${frames:$i:1}"
+        sleep "$delay"
+    done
+
+    printf "\r%-30s\r" " "
+    tput cnorm 2>/dev/null
+}
+
 START_TIME=$(date +%s)
 
 EXT=""
@@ -87,6 +120,18 @@ fi
 BASE_DIR="${BASE_DIR%/}"
 EXT_LC=$(printf '%s' "$EXT" | tr '[:upper:]' '[:lower:]')
 
+TMPFILE=$(mktemp) || {
+    echo "Error: failed to create temporary file."
+    exit 1
+}
+
+cleanup() {
+    rm -f "$TMPFILE"
+    tput cnorm 2>/dev/null
+}
+trap cleanup EXIT
+
+(
 find "$BASE_DIR" -type f -printf '%s\t%h\t%f\n' 2>/dev/null | awk -F'\t' -v base="$BASE_DIR/" -v ext_lc="$EXT_LC" '
 function human(x) {
     split("B KB MB GB TB PB", u, " ")
@@ -131,7 +176,14 @@ END {
 
     for (d in sum)
         printf "%020d\t%08d\t%s\n", sum[d], cnt[d], d
-}' | {
+}' > "$TMPFILE"
+) &
+
+WORK_PID=$!
+spinner "$WORK_PID"
+wait "$WORK_PID"
+
+{
     read -r line1
     read -r line2
     read -r line3
@@ -155,9 +207,9 @@ END {
         folder = ($3 == "." ? "./ (root)" : $3)
         printf "%-14s %-8d %s\n", human($1), $2, folder
     }'
-}
+} < "$TMPFILE"
 
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 
-printf "\nElapsed time: %ds\n" "$ELAPSED"
+printf "\nElapsed time: %s\n" "$(format_time "$ELAPSED")"
