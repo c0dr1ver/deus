@@ -43,12 +43,14 @@ Designed for quick diagnostics and disk usage analysis without multiple filesyst
 ## Example
 
 ```bash
-$ ./deus.sh /home/user/Downloads/
-Enter the file extension (e.g. mp3, pdf): pdf
-Total files: 1106
-Total size : 1.27 GB
+$ ./deus.sh /home/user/Downloads/ --ext mp3
+Total files: 166441           
+Total size : 123.92 GB (19.4%)
 
 Size           Files    Folder
-759.96 MB      576      Telegram Desktop
-533.53 MB      517      ./ (root)
-6.96 MB        13       RDP
+96.81 GB       155314   voximplant
+26.03 GB       2349     crm
+658.21 MB      2156     disk
+442.67 MB      6622     imconnector
+
+Elapsed time: 11m 34s
